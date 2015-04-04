@@ -25,7 +25,7 @@ properties :: TestTree
 properties = testGroup "Properties" [qcProps]
 
 -- tests pass for rational, but representation is not going to be very nice
-type Amount = Centi
+type Amount = Milli
 
 multiplyAndDivide :: Amount -> Amount -> Amount
 multiplyAndDivide a b = (a * b) / b
