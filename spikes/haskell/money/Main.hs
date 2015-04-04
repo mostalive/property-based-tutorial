@@ -1,10 +1,12 @@
 -- We use the ScopedTypedVariables extension so we can describe types right inside our property descriptions
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE ScopedTypeVariables        #-}
 import           Test.Tasty
 
 --import           Data.ByteString.Builder.Scientific
 --import           Data.Scientific                    as Scientific
 import           Data.Fixed
+import           Data.Monoid           ((<>))
 import           Test.Tasty.QuickCheck as QC
 -- Money type
 -- |We use a newtype here, so we have type safety, but can use the operations from the number inside amount
@@ -35,9 +37,19 @@ propMultiplyAndDivide :: Amount -> NonZero Amount -> Bool
 propMultiplyAndDivide v (NonZero n) = (multiplyAndDivide v n) == v
 
 -- | If you do this a lot in your application, it might be worth making a ReadAndShow typeclass with a default implementation of ReadAndShow t, so you can reuse the readAndShow property over a number of implementations, because you can define the property against the typeclass
-readAndShowAmount :: String -> String
-readAndShowAmount s = show a
-                  where a = read s :: Amount
+readAndShowAmount :: AmountDisplay -> AmountDisplay
+readAndShowAmount = read . show
+
+-- following "Tip: Using newtype" in http://www.cse.chalmers.se/~rjmh/QuickCheck/manual.html
+newtype AmountDisplay = AmountDisplay String deriving (Show, Read, Eq)
+
+-- do notation for arbitrary - http://stackoverflow.com/questions/16440208/how-to-generate-arbitrary-instances-of-a-simple-type-for-quickcheck
+-- handy because we can choose Int but need to generate an AmountDisplay through Show-ing String
+instance Arbitrary AmountDisplay where
+  arbitrary = do
+    x :: Int <- choose (-10000,10000)
+    decimals :: Int <- choose (0,99)
+    return $ AmountDisplay ((show x) <> "." <> (show decimals))
 
 qcProps :: TestTree
 qcProps = testGroup "(checked by QuickCheck)"
