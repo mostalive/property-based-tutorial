@@ -7,6 +7,7 @@ import           Test.Tasty
 --import           Data.Scientific                    as Scientific
 import           Data.Fixed
 import           Data.Monoid           ((<>))
+import           Debug.Trace
 import           Test.Tasty.QuickCheck as QC
 -- Money type
 -- |We use a newtype here, so we have type safety, but can use the operations from the number inside amount
@@ -34,7 +35,8 @@ multiplyAndDivide a b = (a * b) / b
 
 -- See the difference with the first step where we used a custom constraint with =>
 propMultiplyAndDivide :: Amount -> NonZero Amount -> Bool
-propMultiplyAndDivide v (NonZero n) = (multiplyAndDivide v n) == v
+propMultiplyAndDivide v (NonZero n) = traceShow v $ traceShow result $ result == v
+                                      where result = (multiplyAndDivide v n)
 
 -- | If you do this a lot in your application, it might be worth making a ReadAndShow typeclass with a default implementation of ReadAndShow t, so you can reuse the readAndShow property over a number of implementations, because you can define the property against the typeclass
 readAndShowAmount :: AmountDisplay -> AmountDisplay
