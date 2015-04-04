@@ -63,6 +63,7 @@ executable money
                        ,tasty-quickcheck
                        ,tasty-smallcheck
                        ,QuickCheck
+                       ,scientific
   -- Directories containing source files.
   -- hs-source-dirs:      
   

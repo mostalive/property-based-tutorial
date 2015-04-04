@@ -1,4 +1,6 @@
-module Main where
+module Main
+       (main, genEndpoint, endPointsLessThanTwenty,prop_pageOK)
+       where
 
 import Prelude as P
 import Test.QuickCheck

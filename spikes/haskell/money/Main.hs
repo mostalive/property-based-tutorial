@@ -1,10 +1,10 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 import           Test.Tasty
-import           Test.Tasty.HUnit
+
+--import           Data.ByteString.Builder.Scientific
+--import           Data.Scientific                    as Scientific
 import           Test.Tasty.QuickCheck as QC
 
-import           Data.List
-import           Data.Ord
 
 -- Money type
 -- |We use a newtype here, so we have type safety, but can use the operations from the number inside amount
@@ -24,19 +24,14 @@ tests = testGroup "Tests" [properties]
 properties :: TestTree
 properties = testGroup "Properties" [qcProps]
 
-{-
-scProps :: TestTree
-scProps = testGroup "(checked by SmallCheck)"
-  [ SC.testProperty "sort == sort . reverse" $
-      \list -> sort (list :: [Int]) == sort (reverse list)
-  ]
--}
+-- tests pass for rational, but representation is not going to be very nice
+type Amount = Rational
 
-multiplyAndDivide :: Float -> Float -> Float
+multiplyAndDivide :: Amount -> Amount -> Amount
 multiplyAndDivide a b = (a * b) / b
 
 qcProps :: TestTree
 qcProps = testGroup "(checked by QuickCheck)"
-  [ QC.testProperty "multiply an amount by N and dividing it by N should yield amount" $
+  [ QC.testProperty  "multiply an amount by N and dividing it by N should yield amount" $
       \(v , n ) -> n > 0.0 ==> (multiplyAndDivide v n) == v
   ]
