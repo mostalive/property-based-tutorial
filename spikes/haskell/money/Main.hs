@@ -7,7 +7,7 @@ import           Test.Tasty
 import           Control.Monad         (liftM)
 --import           Data.ByteString.Builder.Scientific
 --import           Data.Scientific                    as Scientific
-import           Control.Applicative   ((<$>))
+import           Control.Applicative   ((<$>), (<*>))
 import           Data.Fixed
 import           Data.Monoid           ((<>))
 import           Debug.Trace
@@ -27,6 +27,7 @@ data CoinValue = Cent | FiveCent | TenCent | TwentyCent | FiftyCent | OneEuro de
 data Coin = Coin CoinValue
              deriving (Eq, Show,Read,Generic)
 
+value :: Fractional a => Coin -> a
 value (Coin c) = case c of
   Cent -> 1/100
   FiveCent -> 5 / 100
@@ -35,8 +36,9 @@ value (Coin c) = case c of
   FiftyCent -> 50 / 100
   OneEuro -> 100
 
-data CoinBox = CoinBox { -- inbox :: [Coin],
-                         safe :: [Coin]} deriving (Show)
+data CoinBox = CoinBox { inbox :: [Coin]
+                         -- , vault :: [Coin]
+                       } deriving (Show)
 
 instance Arbitrary Coin where
   arbitrary = elements (map Coin [Cent, TenCent])
@@ -44,8 +46,8 @@ instance Arbitrary Coin where
 instance Arbitrary CoinBox where
   arbitrary = CoinBox <$> arbitrary
 
-balance :: Num a => CoinBox -> a
-balance _ = -1
+balance :: Fractional a => CoinBox -> a
+balance (CoinBox i ) = sum $ map value i
 
 main :: IO ()
 main = defaultMain tests
