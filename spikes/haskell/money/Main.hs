@@ -46,11 +46,13 @@ instance Arbitrary Coin where
 instance Arbitrary CoinBox where
   arbitrary = CoinBox <$> arbitrary <*> arbitrary
 
+data Checkout = Checkout { coinBox' :: CoinBox } -- new coinbox and result, is checkout allowed, and how much money is returned
+
 -- Note that we normally start with inserting coins and increasing balance, but the easier property to write is for checkout it seems
 -- Also drives a Checkout data type, so we can indicate success and a value or failure, but be specific about it
 -- but before we implement checkout and its properties, we need to state that the inbox and the vault always have a positive balance
---checkout :: Fractional a => Coinbox -> Checkout
---checkout = undefined
+checkout :: Fractional a => CoinBox -> Checkout
+checkout = Checkout
 
 moneyInserted :: Fractional a => CoinBox -> a
 moneyInserted (CoinBox i _ ) = sum $ map value i
@@ -70,8 +72,17 @@ properties = testGroup "Properties" [qcProps]
 -- tests pass for rational, but representation is not going to be very nice
 type Amount = Rational
 
+-- this will change when people don't pay with exact amount and we give change
+propSumOfBalancesSameOnCheckout :: CoinBox -> Bool
+propSumOfBalancesSameOnCheckout c = sum' == sum
+  where
+    sum = (moneyInserted c) + (balance c)
+    sum' = (moneyInserted c') + (balance c')
+    c' = coinBox' $ checkout c
+
+
 propPositiveBalanceInInbox :: CoinBox -> Bool
-propPositiveBalanceInInbox c = (balance c) >= 0
+propPositiveBalanceInInbox c = (moneyInserted c) >= 0
 
 propPositiveBalanceInVault :: CoinBox -> Bool
 propPositiveBalanceInVault c = (balance c) >= 0
@@ -108,5 +119,7 @@ qcProps = testGroup "(checked by QuickCheck)"
       \s  -> readAndShowAmount s == s
    ,QC.testProperty "Positive Balance in Inbox " $ propPositiveBalanceInInbox
    ,QC.testProperty "Positive Balance in Vault" $ propPositiveBalanceInVault
-  ]
+   ,QC.testProperty "Balances in Inbox and Vault add up to same amount before and after checkout" $ propSumOfBalancesSameOnCheckout
+
+   ]
 
