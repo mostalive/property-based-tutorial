@@ -52,7 +52,7 @@ data Checkout = Checkout { coinBox' :: CoinBox } -- new coinbox and result, is c
 -- Also drives a Checkout data type, so we can indicate success and a value or failure, but be specific about it
 -- but before we implement checkout and its properties, we need to state that the inbox and the vault always have a positive balance
 checkout :: CoinBox -> Checkout
-checkout = Checkout
+checkout (CoinBox _ v) = Checkout $ CoinBox [] v
 
 values :: [Coin] -> Amount
 values = sum . map value
