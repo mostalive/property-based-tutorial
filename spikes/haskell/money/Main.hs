@@ -36,18 +36,27 @@ value (Coin c) = case c of
   FiftyCent -> 50 / 100
   OneEuro -> 100
 
-data CoinBox = CoinBox { inbox :: [Coin]
-                         -- , vault :: [Coin]
+data CoinBox = CoinBox { inbox  :: [Coin]
+                         ,vault :: [Coin]
                        } deriving (Show)
 
 instance Arbitrary Coin where
   arbitrary = elements (map Coin [Cent, TenCent])
 
 instance Arbitrary CoinBox where
-  arbitrary = CoinBox <$> arbitrary
+  arbitrary = CoinBox <$> arbitrary <*> arbitrary
+
+-- Note that we normally start with inserting coins and increasing balance, but the easier property to write is for checkout it seems
+-- Also drives a Checkout data type, so we can indicate success and a value or failure, but be specific about it
+-- but before we implement checkout and its properties, we need to state that the inbox and the vault always have a positive balance
+--checkout :: Fractional a => Coinbox -> Checkout
+--checkout = undefined
+
+moneyInserted :: Fractional a => CoinBox -> a
+moneyInserted (CoinBox i _ ) = sum $ map value i
 
 balance :: Fractional a => CoinBox -> a
-balance (CoinBox i ) = sum $ map value i
+balance (CoinBox _ v ) = sum $ map value v
 
 main :: IO ()
 main = defaultMain tests
@@ -61,8 +70,11 @@ properties = testGroup "Properties" [qcProps]
 -- tests pass for rational, but representation is not going to be very nice
 type Amount = Rational
 
-propPositiveBalance :: CoinBox -> Bool
-propPositiveBalance c = (balance c) >= 0
+propPositiveBalanceInInbox :: CoinBox -> Bool
+propPositiveBalanceInInbox c = (balance c) >= 0
+
+propPositiveBalanceInVault :: CoinBox -> Bool
+propPositiveBalanceInVault c = (balance c) >= 0
 
 multiplyAndDivide :: Amount -> Amount -> Amount
 multiplyAndDivide a b = (a * b) / b
@@ -94,6 +106,7 @@ qcProps = testGroup "(checked by QuickCheck)"
   [ QC.testProperty  "Multiply and then divide Amount by N should yield Amount" $ propMultiplyAndDivide
    ,QC.testProperty "Convert to and from String the same String" $
       \s  -> readAndShowAmount s == s
-   ,QC.testProperty "Positive Balance " $ propPositiveBalance
+   ,QC.testProperty "Positive Balance in Inbox " $ propPositiveBalanceInInbox
+   ,QC.testProperty "Positive Balance in Vault" $ propPositiveBalanceInVault
   ]
 
