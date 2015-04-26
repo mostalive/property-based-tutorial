@@ -54,11 +54,14 @@ data Checkout = Checkout { coinBox' :: CoinBox } -- new coinbox and result, is c
 checkout :: CoinBox -> Checkout
 checkout = Checkout
 
+values :: [Coin] -> Amount
+values = sum . map value
+
 moneyInserted :: CoinBox -> Amount
-moneyInserted (CoinBox i _ ) = sum $ map value i
+moneyInserted (CoinBox i _ ) = values i
 
 balance :: CoinBox -> Amount
-balance (CoinBox _ v ) = sum $ map value v
+balance (CoinBox _ v ) = values v
 
 main :: IO ()
 main = defaultMain tests
@@ -80,6 +83,10 @@ propSumOfBalancesSameOnCheckout c = s' == s
     s' = (moneyInserted c') + (balance c')
     c' = coinBox' $ checkout c
 
+propInboxZeroAfterCheckout :: CoinBox -> Bool
+propInboxZeroAfterCheckout c = (moneyInserted c') == 0
+  where
+    c' = coinBox' $ checkout c
 
 
 propPositiveBalanceInInbox :: CoinBox -> Bool
@@ -121,6 +128,6 @@ qcProps = testGroup "(checked by QuickCheck)"
    ,QC.testProperty "Positive Balance in Inbox " $ propPositiveBalanceInInbox
    ,QC.testProperty "Positive Balance in Vault" $ propPositiveBalanceInVault
    ,QC.testProperty "Balances in Inbox and Vault add up to same amount before and after checkout" $ propSumOfBalancesSameOnCheckout
-
+   ,QC.testProperty "Inbox zero on checkout" $ propInboxZeroAfterCheckout
    ]
 
