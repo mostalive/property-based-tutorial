@@ -27,7 +27,7 @@ data CoinValue = Cent | FiveCent | TenCent | TwentyCent | FiftyCent | OneEuro de
 data Coin = Coin CoinValue
              deriving (Eq, Show,Read,Generic)
 
-value :: Fractional a => Coin -> a
+value :: Coin -> Amount
 value (Coin c) = case c of
   Cent -> 1/100
   FiveCent -> 5 / 100
@@ -51,13 +51,13 @@ data Checkout = Checkout { coinBox' :: CoinBox } -- new coinbox and result, is c
 -- Note that we normally start with inserting coins and increasing balance, but the easier property to write is for checkout it seems
 -- Also drives a Checkout data type, so we can indicate success and a value or failure, but be specific about it
 -- but before we implement checkout and its properties, we need to state that the inbox and the vault always have a positive balance
-checkout :: Fractional a => CoinBox -> Checkout
+checkout :: CoinBox -> Checkout
 checkout = Checkout
 
-moneyInserted :: Fractional a => CoinBox -> a
+moneyInserted :: CoinBox -> Amount
 moneyInserted (CoinBox i _ ) = sum $ map value i
 
-balance :: Fractional a => CoinBox -> a
+balance :: CoinBox -> Amount
 balance (CoinBox _ v ) = sum $ map value v
 
 main :: IO ()
@@ -74,11 +74,12 @@ type Amount = Rational
 
 -- this will change when people don't pay with exact amount and we give change
 propSumOfBalancesSameOnCheckout :: CoinBox -> Bool
-propSumOfBalancesSameOnCheckout c = sum' == sum
+propSumOfBalancesSameOnCheckout c = s' == s
   where
-    sum = (moneyInserted c) + (balance c)
-    sum' = (moneyInserted c') + (balance c')
+    s = (moneyInserted c) + (balance c)
+    s' = (moneyInserted c') + (balance c')
     c' = coinBox' $ checkout c
+
 
 
 propPositiveBalanceInInbox :: CoinBox -> Bool
