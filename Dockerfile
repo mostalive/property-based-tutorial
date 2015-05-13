@@ -9,6 +9,4 @@ RUN add-apt-repository -y ppa:webupd8team/sublime-text-2 && \
     apt-get update && \
     apt-get install sublime-text
 
-CMD ["/bin/bash"]
-
 
