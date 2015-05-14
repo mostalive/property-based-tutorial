@@ -16,7 +16,7 @@ testing really gained traction, with QuickCheck) flavours.
 ### You have a NodeJs or a working Haskell installation on your machine
 
 clone this repository `git clone
-https://github.com/mostalive/property-based-tutorial.git`
+https://github.com/qwaneu/property-based-tutorial.git`
 
 #### Javascript
 
@@ -26,7 +26,7 @@ npm ???
 
 ```
 
-### Haskell
+#### Haskell
 
 ```
 cd exercises/hsmoney
