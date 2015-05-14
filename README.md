@@ -13,7 +13,7 @@ testing really gained traction, with QuickCheck) flavours.
 
 ## Installation options
 
-### You have a NodeJs or a working Haskell installation on your machine
+### You have a working NodeJS or Haskell installation on your machine
 
 clone this repository `git clone
 https://github.com/qwaneu/property-based-tutorial.git`
@@ -78,3 +78,8 @@ This is cool, but a bit more work.
 #### NodeJS - cloud9 ide?
 
 #### Haskell - FPComplete
+
+### If all else failse
+
+Pair up with someone. We recommend this anyway for a better learning
+experience.
