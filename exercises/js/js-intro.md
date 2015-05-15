@@ -303,3 +303,25 @@ by refining the sorting function.
 Another property is whether the menu items are grouped by
 their labels. How can you check this? Write the property.
 
+
+# Integrating it in a unit testing framework
+
+How do you integrate property based tests with your other automated
+tests?
+
+Property based testing libraries normally provide integration with
+popular testing frameworks. Jsverify integrates for example with the
+Javascript testing library Mocha:
+
+```javascript
+describe('A proper menu', function () {
+  it('has its items sorted by value', function () {
+    p.assert(itemsAreSortedByValue);
+  });
+});
+```
+
+npm install mocha
+
+mocha <your javascript file.js>
+
