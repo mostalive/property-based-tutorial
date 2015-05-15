@@ -1,3 +1,11 @@
+% Property Based Testing Hands On - Javascript money exercise
+% (c) QWAN - Quality Without a Name - www.qwan.eu
+% May 2015
+
+- Rob Westgeest - rob@qwan.eu
+- Marc Evers - marc@qwan.eu
+- Willem van den Ende - willem@qwan.eu
+
 # Modelling Money
 
 In this exercise, we are going to build a class representing Money, step by step. 
@@ -35,19 +43,19 @@ Money.prototype.add = function (money) {
 
 Start with something simple: when we add two amounts of the same
 currency, we get a new amount. Our property needs two money objects, so
-we pass two generators to forall and define a property function with two
+we pass two arbitraries to forall and define a property function with two
 arguments:
 
 ```javascript 
 var moneyOfSameCurrencyAddsUp = p.forall(amount, amount, function(a1, a2) { ... }
 ```
 
-Create the *amount* generator. Generating the currency is simple, e.g.: 
+Create the *amount* arbitrary. Generating the currency is simple, e.g.: 
 
 var currencies = p.elements(["EUR", "USD", "GBP"]);
 
-How do we generate Money instances? We use the generator combinator *pair*
-to generate amount-currency pairs and use jsverify's *smap* function to transform the pair into a Money object (and back again).
+How do we generate Money instances? We use the *pair* arbitrary
+combinator to generate amount-currency pairs and use jsverify's *smap* function to transform the pair into a Money object (and back again).
 'smap' stands for symmetric map, and requires two functions, to do a mapping and to perform the inverse mapping:
 
 ```javascript 
@@ -160,11 +168,11 @@ to different design decisions.
 Given correct input, the conversion should produce valid Money objects. 
 How would you define this as property? 
 
-Write a generator that creates valid input strings. You can again use smap to create valid strings
+Write an arbitrary that creates valid input strings. You can again use smap to create valid strings
 from primitive values.
 
 Hints and tips:
-- If you let your generator generate a tuple (array) of an input string together
+- If you let your arbitrary generate a tuple (array) of an input string together
   with the corresponding amount and currency values, it will be easier.
   for your property function to check correctness: __['EUR 100', 'EUR', 100]__
 - Take baby steps; start e.g. with regular input with a currency; add support for the default currency; add
@@ -178,23 +186,23 @@ Money object or a validation error: { money: ... } or { error: 'some message' }
 
 Define a property that captures this.
 
-Write a generator that creates all kinds of input strings. Is the
-'asciistring' generator suited for this? Why (not)? 
+Write an arbitrary that creates all kinds of input strings. Is the
+'asciistring' arbitrary suited for this? Why (not)? 
 
 Corner cases that almost look like valid input are particularly
-interesting, like "EUR 12jsde", "HFL 30", and "300 EUR". Adapt your generator so that 
+interesting, like "EUR 12jsde", "HFL 30", and "300 EUR". Adapt your arbitrary so that 
 it will generate cases like these.
 
 Refine your conversion function and make sure the correctness property
 is also satisfied.
 
 Hints and tips:
-- jsverify provides the 'oneof' function that combines two generators
-  into one that generates values taking values from both generators.
+- jsverify provides the 'oneof' function that combines two arbitraries
+  into one that generates values taking values from both arbitraries.
 
 ### Reflection
 
-How did defining the properties and the generators influence you in
+How did defining the properties and the arbitraries influence you in
 thinking about the problem?
 
 Where would you like to put the property logic? To what extent is it
