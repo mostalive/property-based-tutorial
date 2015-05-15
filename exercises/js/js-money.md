@@ -119,6 +119,8 @@ And some illegal values:
 - USD 4.999 (USD has , as thousand separator and . as cents separator)
 - 1,000 (illegal because EUR is default and EUR uses . as thousand
   separator)
+- HFL 50 (illegal currency)
+- EUR 10bla
 
 In our domain model, we work with valid objects. This part focuses on
 processing and validation outside, 'untrusted' data that is transformed
@@ -126,13 +128,40 @@ into domain objects (e.g. data coming in from a web form). We want this transfor
 handle any data and only results in valid domain objects when it is able
 to (and we don't need to do defensive programming in our domain).
 
-There are two aspects we would like to check:
+There are actually two concerns we need to address:
 
-- For valid strings, is a valid Money object with the correct contents
-  created?
-- For any string, is the conversion robust? In other words: does the
-  conversion always produce either a valid Money object or a rejection
-of the input? 
+- Given the input string is valid, will our code create a valid Money
+  object with the correct contents?
+- Is the conversion code robust for every possible input string? The
+  code should always either return a valid Money object or a rejection of the input. 
+  It should not throw unexpected exceptions or create invalid Money
+  objects
 
+Define conversion function that returns a JSON object that is either { money: <valid money
+object> } or { error: 'some error message' }
 
+```javascript
+function moneyFromString(input) {
+  var theMoney = new Money(...);
+  return { money: theMoney };
+}
+```
+
+(todo)
+
+_start with the valid input_
+- create a generator that creates valid input strings; use smap to
+  create proper strings; if you create tuples of the input string +
+amount + currency, you can check the conversion in the property
+- start with simple strings; then add the default currency; then add
+  support for thousand separators
+
+_then do robustness_
+- create a generator that creates all kinds of input strings; what
+  happens if you use the asciistring generator? can you define a more
+specific generator that generates input that looks a bit like valid
+data? (e.g. "EUR 12jsde" should be rejected)
+
+What happens if you would start with robustness and do correct conversion afterwards?
+(rewind / try?)
 
