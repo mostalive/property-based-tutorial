@@ -20,6 +20,7 @@ Create a new file Step1 with a module declaration.
 
 \begin{code}
 {-# LANGUAGE ScopedTypeVariables #-} -- We will explain why we need this later
+{-# LANGUAGE TemplateHaskell #-} -- to build a suite of properties automagically
 module Step1 where
 \end{code}
 
@@ -28,6 +29,9 @@ We need the Test.QuickCheck module to generate random data, we will show how to 
 \begin{code}
 import Test.QuickCheck
 import Debug.Trace (traceShow)
+import Language.Haskell.TH
+import Test.QuickCheck.All (quickCheckAll)
+import Test.QuickCheck.Property ((===))
 \end{code}
 
 Let's start with a simple example using some math functions, to introduce the basic concepts.
@@ -52,8 +56,8 @@ sqrt (squared n) == n
 So we define a property stating just that. We have to add a type signature here, so that QuickCheck can choose what kind of values to generate. At this stage it will compile just fine, compilation will fail once you use it with quickCheck, because there are several Floating instances to choose from.
 
 \begin{code}
-propSquareRootOfNSquaredEqualsN :: Double -> Bool 
-propSquareRootOfNSquaredEqualsN n = sqrt (squared n) == n
+prop_SquareRootOfNSquaredEqualsN :: Double -> Property 
+prop_SquareRootOfNSquaredEqualsN n = sqrt (squared n) === n
 \end{code}
 
 Starting it with 'prop' is just a naming convention. You can load this into ghci and play around with it for some n.
@@ -61,7 +65,7 @@ Starting it with 'prop' is just a naming convention. You can load this into ghci
 And now comes the magic:
 
 \begin{code}
-main0 = quickCheck propSquareRootOfNSquaredEqualsN
+main0 = quickCheck prop_SquareRootOfNSquaredEqualsN
 \end{code}
 
 Run it, In ghci, or call your function 'main' and use `cabal exec <filename>`. We number them here because we can only have one main, and we like to execute our documentation.
@@ -79,7 +83,7 @@ By default it is configured to generate 100 test cases. You can specify a
 different number like so:
 
 \begin{code}
-main1 = quickCheckWith stdArgs { maxSuccess = 10 } propSquareRootOfNSquaredEqualsN
+main1 = quickCheckWith stdArgs { maxSuccess = 10 } prop_SquareRootOfNSquaredEqualsN
 \end{code}
 
 On a failure, QuickCheck only shows the resulting value, not the input. If you want to see all the inputs and results,
@@ -97,23 +101,41 @@ main2 = quickCheck propTraceSqrNEqualsN
 
 How does it know to generate test data? QuickCheck will use the properties' type to generate data. Default generators are available for many built-in types such as numbers, strings and even functions.
 
-We can also use generators explicitly. You can find many available generators by [searching hoogle on ::Gen a](https://www.haskell.org/hoogle/?hoogle=%3a%3a+Gen+a) or browsing [the Test.QuickCheck.Gen module documentation](http://hackage.haskell.org/package/QuickCheck-2.8.1/docs/Test-QuickCheck-Gen.html)
-
-We often use choose, to limit the range of numbers to  look for.
+The test fails because the invariant does not hold for negative numbers.
+We should restrict the generated input to natural numbers only (>=0). We can do this by changing the type of our generator to NonNegative a, in our case NonNegative Double. NonNegative is a [Modifier](https://hackage.haskell.org/package/QuickCheck-2.8.1/docs/Test-QuickCheck-Modifiers.html)
 
 \begin{code}
 propSqrPositive :: NonNegative Double -> Bool
 propSqrPositive (NonNegative n) = (sqrt (squared n)) == n
 
-main = quickCheck propSqrPositive
+main3 = quickCheck propSqrPositive
 
 \end{code}
 
-It is a _generator_ that can generate random integers. More about
-generators later on.
+We can also use generators explicitly. You can find many available generators by [searching hoogle on ::Gen a](https://www.haskell.org/hoogle/?hoogle=%3a%3a+Gen+a) or browsing [the Test.QuickCheck.Gen module documentation](http://hackage.haskell.org/package/QuickCheck-2.8.1/docs/Test-QuickCheck-Gen.html)
 
-The test fails because the invariant does not hold for negative numbers.
-We should restrict the generated input to natural numbers only (>=0).
-Replace p.integer() by p.nat() and run it again.
+We could for instance say we are only interested in numbers between one and 100. For that we use the `choose` function together with forAll.
+
+\begin{code} 
+
+smallPositiveInteger = choose (1,1000)
+
+propSqrSmallInt = forAll smallPositiveInteger $ \n -> (sqrt (squared n)) == (n :: Double)
+
+main4 = quickCheck propSqrSmallInt
+\end{code}
+
+There is one subtlety we did not show, if you use forAll, the type of your property changes, it no longer results in a Bool, but a Property. We can declare it like this:
+
+\begin{code} 
+propSqrSmallInt :: Property
+\end{code}
+
+\begin{code}
 
 
+return []
+runTests = $quickCheckAll
+
+main = runTests
+\end{code}
