@@ -6,24 +6,18 @@
 - Marc Evers - marc@qwan.eu
 - Willem van den Ende - willem@qwan.eu
 
-# Introduction
-
-## Concepts to be introduced:
-
-- properties
-- generators
-- shrinking
-- filtering and/or restricting input values
 
 # Prerequisites
 
 You need NodeJS (and NPM) and a terminal plus your favorite editor to do
-the Javascript exercise. We
-use the jsverify library in this tutorial. There are many
+the Javascript exercise. 
+We use the __jsverify__ library in this tutorial. There are many
 libraries available in your favorite languages, but the basic principles are
 the same.
 
+```bash
 https://github.com/jsverify/jsverify
+```
 
 You need the following node modules for these exercises: 
 
@@ -32,12 +26,21 @@ npm install jsverify
 npm install underscore
 ```
 
+# Property based testing concepts
+
+We will introduce the following concepts 
+- __properties__ - functions that capture invariants of the system under
+  tets
+- __arbitraries__, __generators__ and __shrinking__ - functions that produce
+  arbitrary input data and minimal counter examples
+- restricting input values
+
 # First steps at properties and property based testing
 
 Let's start with a simple example using some math functions, to introduce the basic concepts.
 An invariant of the square root and square functions is:
 
-a number's square is equal to that number: sqrt( x * x ) = x 
+- a number's square is equal to that number: sqrt( x * x ) = x 
 
 In an example based test approach, we would write a small number examples showing that this holds.
 We now want to 'proof' that the mentioned invariant holds for all numbers.
@@ -85,14 +88,14 @@ Currently it is configured to generate 100 test cases. You can specify a
 different number using the tests property of the options.
 
 How does it know to generate test data? p.integer() does the job here.
-It is a _generator_ that can generate random integers. More about
+It is an _arbitrary_ that can generate random integers. More about
 generators later on.
 
 The test fails because the invariant does not hold for negative numbers.
 We should restrict the generated input to natural numbers only (>=0).
 Replace p.integer() by p.nat() and run it again.
 
-JSVerify provides generators for all the basic types:
+JSVerify provides arbitraries for all the basic types:
 
 - p.integer() - integers
 - p.nat() - natural numbers
@@ -120,9 +123,15 @@ at the counter examples that are reported.
 ## What we have learned
 
 We have learned about _properties_ which are invariants of the code
-under test and about _generators_ that generate random, valid inputs for
+under test and about _arbitraries_ that generate random, valid inputs for
 the code under test.
 
+_Arbitraries vs generators_: in texts about property based testing, you
+will encounter both 'arbitraries' and 'generators'. A generator is a
+function that can generate arbitrary data of a specific type. An
+arbitrary combines a generator with a shrinking function. Shrinking is
+used when a counter example is found, to reduce the counter example to
+the smallest one that still fails the property.
 
 # A more complicated exercise
 
@@ -182,17 +191,17 @@ function complicatedSort(values) {
 
 Run the test again. What happens now? Make it work!
 
-We are using the p.nearray _generator combinator_. Based on a provided
-generator (asciistring for ASCII strings in this case), it returns a new generator
+We are using the p.nearray combinator for arbitraries. Based on a provided
+arbitrary (asciistring for ASCII strings in this case), it returns a new arbitrary
 that generates arrays of ASCII strings.
 
-## More interesting generators
+## More interesting arbitraries 
 
 We don't want plain strings as inputs, we want to work with more structured
 objects instead. How do we generate those?
 
-We already saw how to compose a generator from an array generator and a
-string generator. There are more generator combinators available.
+We already saw how to compose an arbitrary from an array arbitrary and a
+string arbitrary. There are more combinators available.
 
 ```javascript
 var menuItems = p.record({label: p.asciistring, value: p.asciistring})
@@ -205,7 +214,7 @@ Don't forget to update the sorting function: a.value.localeCompare(b.value)
 
 and the property checks: array[index].value
 
-## Refining the property and the generator
+## Refining the property and the arbitrary
 
 The current definition of the property checks if all menu items are
 sorted, but we want to have them sorted per label. Let's group the
@@ -269,7 +278,7 @@ The disadvantage of filtering input data is that you drop quite a lot of
 data and your test becomes less meaningful because of the low number of
 actual samples tested. 
 
-An alternative approach is to put restriction on your generators. JSVerify
+An alternative approach is to put restriction on your arbitraries. JSVerify
 offers the 'suchthat' function to restrict generated values: 
 
 ```javascript
@@ -288,7 +297,7 @@ var labels = p.elements(["main", "drinks", ""]);
 var menuitems = p.record({label: labels, value: asciistring})
 ```
 
-The 'elements' generator generators values from a given array.
+The 'elements' arbitrary generates values from a given array.
 
 ## Defining more properties
 
@@ -302,4 +311,28 @@ by refining the sorting function.
 
 Another property is whether the menu items are grouped by
 their labels. How can you check this? Write the property.
+
+
+# Integrating it in a unit testing framework
+
+How do you integrate property based tests with your other automated
+tests?
+
+Property based testing libraries normally provide integration with
+popular testing frameworks. Jsverify integrates for example with the
+Javascript testing library Mocha:
+
+```javascript
+describe('A proper menu', function () {
+  it('has its items sorted by value', function () {
+    p.assert(itemsAreSortedByValue);
+  });
+});
+```
+
+```bash
+npm install mocha
+
+mocha <your javascript file.js>
+```
 

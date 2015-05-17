@@ -1,3 +1,11 @@
+% Property Based Testing Hands On - Javascript money exercise
+% (c) QWAN - Quality Without a Name - www.qwan.eu
+% May 2015
+
+- Rob Westgeest - rob@qwan.eu
+- Marc Evers - marc@qwan.eu
+- Willem van den Ende - willem@qwan.eu
+
 # Modelling Money
 
 In this exercise, we are going to build a class representing Money, step by step. 
@@ -35,19 +43,19 @@ Money.prototype.add = function (money) {
 
 Start with something simple: when we add two amounts of the same
 currency, we get a new amount. Our property needs two money objects, so
-we pass two generators to forall and define a property function with two
+we pass two arbitraries to forall and define a property function with two
 arguments:
 
 ```javascript 
 var moneyOfSameCurrencyAddsUp = p.forall(amount, amount, function(a1, a2) { ... }
 ```
 
-Create the *amount* generator. Generating the currency is simple, e.g.: 
+Create the *amount* arbitrary. Generating the currency is simple, e.g.: 
 
 var currencies = p.elements(["EUR", "USD", "GBP"]);
 
-How do we generate Money instances? We use the generator combinator *pair*
-to generate amount-currency pairs and use jsverify's *smap* function to transform the pair into a Money object (and back again).
+How do we generate Money instances? We use the *pair* arbitrary
+combinator to generate amount-currency pairs and use jsverify's *smap* function to transform the pair into a Money object (and back again).
 'smap' stands for symmetric map, and requires two functions, to do a mapping and to perform the inverse mapping:
 
 ```javascript 
@@ -131,14 +139,18 @@ to (and we don't need to do defensive programming in our domain).
 There are actually two concerns we need to address:
 
 - Given the input string is valid, will our code create a valid Money
-  object with the correct contents?
+  object with the correct contents? (correctness)
 - Is the conversion code robust for every possible input string? The
   code should always either return a valid Money object or a rejection of the input. 
   It should not throw unexpected exceptions or create invalid Money
-  objects
+  objects (robustnesss)
+
+Let's capture these in properties.
 
 Define conversion function that returns a JSON object that is either { money: <valid money
 object> } or { error: 'some error message' }
+
+Start e.g. with something like:
 
 ```javascript
 function moneyFromString(input) {
@@ -147,21 +159,56 @@ function moneyFromString(input) {
 }
 ```
 
-(todo)
+We can start with either correctness or robustness first. It would be
+interesting to try both approaches and see whether and how it drives you
+to different design decisions.
 
-_start with the valid input_
-- create a generator that creates valid input strings; use smap to
-  create proper strings; if you create tuples of the input string +
-amount + currency, you can check the conversion in the property
-- start with simple strings; then add the default currency; then add
-  support for thousand separators
+### Correctness
 
-_then do robustness_
-- create a generator that creates all kinds of input strings; what
-  happens if you use the asciistring generator? can you define a more
-specific generator that generates input that looks a bit like valid
-data? (e.g. "EUR 12jsde" should be rejected)
+Given correct input, the conversion should produce valid Money objects. 
+How would you define this as property? 
 
-What happens if you would start with robustness and do correct conversion afterwards?
-(rewind / try?)
+Write an arbitrary that creates valid input strings. You can again use smap to create valid strings
+from primitive values.
+
+Hints and tips:
+- If you let your arbitrary generate a tuple (array) of an input string together
+  with the corresponding amount and currency values, it will be easier.
+  for your property function to check correctness: __['EUR 100', 'EUR', 100]__
+- Take baby steps; start e.g. with regular input with a currency; add support for the default currency; add
+  support for thousand separators.
+- Make sure your test fails for the right reason at every step. 
+
+### Robustness
+
+Given any input, the conversion should always produce either a valid
+Money object or a validation error: { money: ... } or { error: 'some message' }
+
+Define a property that captures this.
+
+Write an arbitrary that creates all kinds of input strings. Is the
+'asciistring' arbitrary suited for this? Why (not)? 
+
+Corner cases that almost look like valid input are particularly
+interesting, like "EUR 12jsde", "HFL 30", and "300 EUR". Adapt your arbitrary so that 
+it will generate cases like these.
+
+Refine your conversion function and make sure the correctness property
+is also satisfied.
+
+Hints and tips:
+- jsverify provides the 'oneof' function that combines two arbitraries
+  into one that generates values taking values from both arbitraries.
+
+### Reflection
+
+How did defining the properties and the arbitraries influence you in
+thinking about the problem?
+
+Where would you like to put the property logic? To what extent is it
+test code, to what extent should/could it be part of production code?
+
+What happens if you would start with robustness first and then correctness? 
+Do the exercise again, but start with robustness and see if this leads
+you to different design decisions.
 
