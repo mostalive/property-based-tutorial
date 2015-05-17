@@ -67,4 +67,5 @@ executable workbook
   other-modules:       Step1
                        ,PropertySuite
                        ,Debugging
+                       ,Money
 

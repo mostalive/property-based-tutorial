@@ -5,6 +5,7 @@ module Main where
 import Step1 as S
 --import Debugging as D
 import PropertySuite as P
+import Money as M
 \end{code}
 
 Manually aggregated property suite.
