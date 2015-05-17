@@ -28,7 +28,7 @@ We can create representations of all kinds of different coins, but it is
 sufficient for now to just model two or three (like 10 cents and 50
 cents). 
 
-Starts with a few simple invariants, like:
+Start with a few simple invariants, like:
 - the total value of the coins in the inbox should always be >= 0
 - the total value of the coins in the vault should always be >= 0
 
@@ -39,7 +39,7 @@ properties one by one, first letting them fail. Write the simplest version of th
 
 Now proceed with implementing checkouts. For now, assume that you do a checkout of all the coins present in the inbox.
 
-a property concerning checkouts: first, a checkout
+First, a property concerning checkouts: first, a checkout
 empties the inbox. Write a property for this, see it fail for the right reason.
 
 Second, a checkout should not modify the total value of the coins in the inbox and vault.
@@ -70,7 +70,7 @@ properties keep on being satisfied!
 
 ## Possible next steps
 
-If you want to continu with this exercise, you can work on for example:
+If you want to continue with this exercise, your next steps could be:
 
 - Conditional checkout: pass a price to the checkout
   function and only check out if the inbox contains a sufficient amount
