@@ -46,6 +46,7 @@ We now want to 'proof' that the mentioned invariant holds for all numbers.
 Define the 'system under test'
 
 \begin{code}
+squared :: Int -> Int
 squared x = x * x
 \end{code}
 
@@ -56,11 +57,11 @@ sqrt (squared n) == n
 So we define a property stating just that. We have to add a type signature here, so that QuickCheck can choose what kind of values to generate. At this stage it will compile just fine, compilation will fail once you use it with quickCheck, because there are several Floating instances to choose from.
 
 \begin{code}
-prop_SquareRootOfNSquaredEqualsN :: Double -> Property 
-prop_SquareRootOfNSquaredEqualsN n = sqrt (squared n) === n
+prop_SquareRootOfNSquaredEqualsN :: Int -> Bool
+prop_SquareRootOfNSquaredEqualsN n = (sqrt $ fromIntegral $ squared n) == fromIntegral n
 \end{code}
 
-Starting it with 'prop' is just a naming convention. You can load this into ghci and play around with it for some n.
+Starting it with 'prop' is not just a naming convention, we will use this later on to load all properties. You can load this into ghci and play around with it for some n.
 
 And now comes the magic:
 
@@ -90,25 +91,25 @@ On a failure, QuickCheck only shows the resulting value, not the input. If you w
 use traceShow inside the property. This can be very useful when developing new properties, or understanding a regression.
 
 \begin{code}
-propTraceSqrNEqualsN :: Double -> Bool
-propTraceSqrNEqualsN n = debugShow $ result == n
+prop_TraceSqrNEqualsN :: Int -> Property
+prop_TraceSqrNEqualsN n = debugShow $ result === n
   where
-    result = sqrt (squared n)
+    result = sqrt $ fromIntegral $ squared n
     debugShow = traceShow $ "input: " ++ show n ++ " result: " ++ show result
 
-main2 = quickCheck propTraceSqrNEqualsN
+main2 = quickCheck prop_TraceSqrNEqualsN
 \end{code}
 
 How does it know to generate test data? QuickCheck will use the properties' type to generate data. Default generators are available for many built-in types such as numbers, strings and even functions.
 
 The test fails because the invariant does not hold for negative numbers.
-We should restrict the generated input to natural numbers only (>=0). We can do this by changing the type of our generator to NonNegative a, in our case NonNegative Double. NonNegative is a [Modifier](https://hackage.haskell.org/package/QuickCheck-2.8.1/docs/Test-QuickCheck-Modifiers.html)
+We should restrict the generated input to natural numbers only (>=0). We can do this by changing the type of our generator to NonNegative a, in our case NonNegative Int. NonNegative is a [Modifier](https://hackage.haskell.org/package/QuickCheck-2.8.1/docs/Test-QuickCheck-Modifiers.html)
 
 \begin{code}
-propSqrPositive :: NonNegative Double -> Bool
-propSqrPositive (NonNegative n) = (sqrt (squared n)) == n
+prop_SqrPositive :: NonNegative Int -> Bool
+prop_SqrPositive (NonNegative n) = (sqrt $ fromIntegral $ squared n) == n
 
-main3 = quickCheck propSqrPositive
+main3 = quickCheck prop_SqrPositive
 
 \end{code}
 
@@ -120,20 +121,18 @@ We could for instance say we are only interested in numbers between one and 100.
 
 smallPositiveInteger = choose (1,1000)
 
-propSqrSmallInt = forAll smallPositiveInteger $ \n -> (sqrt (squared n)) == (n :: Double)
+prop_SqrSmallInt = forAll smallPositiveInteger $ \n -> (sqrt (squared n)) == (n :: Int)
 
-main4 = quickCheck propSqrSmallInt
+main4 = quickCheck prop_SqrSmallInt
 \end{code}
 
 There is one subtlety we did not show, if you use forAll, the type of your property changes, it no longer results in a Bool, but a Property. We can declare it like this:
 
 \begin{code} 
-propSqrSmallInt :: Property
+prop_SqrSmallInt :: Property
 \end{code}
 
 \begin{code}
-
-
 return []
 runTests = $quickCheckAll
 
