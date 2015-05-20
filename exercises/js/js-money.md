@@ -50,7 +50,7 @@ arguments:
 var moneyOfSameCurrencyAddsUp = p.forall(amount, amount, function(a1, a2) { ... }
 ```
 
-Create the *amount* arbitrary. Generating the currency is simple, e.g.: 
+Create the *amount* arbitrary. We can generating the currency e.g. using: 
 
 var currencies = p.elements(["EUR", "USD", "GBP"]);
 
