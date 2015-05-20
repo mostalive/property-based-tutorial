@@ -3,14 +3,15 @@
 Workshop materials and experiments for property based testing tutorial
 at the Joy of Coding 2015.
 
-## Install
-Nothing much useful here yet, just some experiments with property based
-testing we develop in the open, to see which example is the most useful
-for a tutorial.
-
 The tutorial comes in two flavours:
 - Javascript - because virtually everyone has to use it these days
 - Haskell - because that is where property-based testing really gained traction with QuickCheck
+
+## Current status
+
+This is a work in progress, check back shortly before the conference for
+the final version. Your feedback on things that work and don't is
+appreciated.
 
 ## Installation options
 
