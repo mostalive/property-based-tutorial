@@ -43,13 +43,16 @@ npm install underscore
 
 ```
 cd exercises/hsmoney
-cabal install --only-dependencies --enable-tests
+cabal install --only-dependencies
 ```
 
 Run the tests with
 ```
-cabal -j test
+cabal build joy && cabal exec joy 
 ```
+
+Or use the repl, see the [detailed README](exercises/hsmoney/README.md)
+for instructions.
 
 ### You have Docker
 
@@ -108,9 +111,14 @@ npm install jsverify
 npm install underscore
 ```
 
-#### Haskell - FPComplete
+#### Haskell - FPComplete IDE
 
 `https://www.fpcomplete.com`
+
+Fork this repository to your own account if you want to save your work,
+and then clone it from within FPComplete IDE. You can also just clone
+https://github.com/qwaneu/property-based-tutorial from within the IDE
+and dispose of your work later.
 
 ### If all else fails
 
