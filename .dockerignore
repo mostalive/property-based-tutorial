@@ -1,1 +1,5 @@
 spikes
+exercises/hsmoney/.cabal-sandbox
+exercises/hsmoney/cabal.sandbox.config
+exercises/hsmoney/dist
+exercises/hsmoney/Setup.hs
