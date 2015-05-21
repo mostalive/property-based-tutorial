@@ -40,13 +40,15 @@ data CoinBox = CoinBox { inbox  :: [Coin]
                          ,vault :: [Coin]
                        } deriving (Show)
 
+data Checkout = Checkout { coinBox' :: CoinBox } -- new coinbox and result, is checkout allowed, and how much money is returned
+
 instance Arbitrary Coin where
   arbitrary = elements (map Coin [Cent, TenCent])
 
 instance Arbitrary CoinBox where
   arbitrary = CoinBox <$> arbitrary <*> arbitrary
 
-data Checkout = Checkout { coinBox' :: CoinBox } -- new coinbox and result, is checkout allowed, and how much money is returned
+
 
 -- Note that we normally start with inserting coins and increasing balance, but the easier property to write is for checkout it seems
 -- Also drives a Checkout data type, so we can indicate success and a value or failure, but be specific about it
@@ -54,15 +56,20 @@ data Checkout = Checkout { coinBox' :: CoinBox } -- new coinbox and result, is c
 checkout :: CoinBox -> Checkout
 checkout (CoinBox i v) = Checkout $ CoinBox [] (v <> i)
 
-values :: [Coin] -> Amount
-values = sum . map value
+insertCoin :: CoinBox -> Coin -> CoinBox
+insertCoin = undefined
+
+valueSum :: [Coin] -> Amount
+valueSum = sum . map value
 
 moneyInserted :: CoinBox -> Amount
-moneyInserted (CoinBox i _ ) = values i
+moneyInserted (CoinBox i _ ) = valueSum i
 
 balance :: CoinBox -> Amount
-balance (CoinBox _ v ) = values v
+balance (CoinBox _ v ) = valueSum v
 
+
+--- test code and main
 main :: IO ()
 main = defaultMain tests
 
@@ -74,6 +81,15 @@ properties = testGroup "Properties" [qcProps]
 
 -- tests pass for rational, but representation is not going to be very nice
 type Amount = Rational
+
+propInsertingCoinIncreasesValue :: CoinBox -> Coin -> Bool
+propInsertingCoinIncreasesValue cb c = bal' > bal
+  where
+    cb' = insertCoin cb c
+    bal = balance cb
+    bal' = balance cb'
+    -- v = value c
+
 
 -- this will change when people don't pay with exact amount and we give change
 propSumOfBalancesSameOnCheckout :: CoinBox -> Bool
@@ -129,5 +145,6 @@ qcProps = testGroup "(checked by QuickCheck)"
    ,QC.testProperty "Positive Balance in Vault" $ propPositiveBalanceInVault
    ,QC.testProperty "Balances in Inbox and Vault add up to same amount before and after checkout" $ propSumOfBalancesSameOnCheckout
    ,QC.testProperty "Inbox zero on checkout" $ propInboxZeroAfterCheckout
+   ,QC.testProperty "Inserting a coin increases balance" $ propInsertingCoinIncreasesValue
    ]
 

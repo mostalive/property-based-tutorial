@@ -1,7 +1,7 @@
 dist
 cabal-dev
-*.o
-*.hi
+*.*o
+*.*hi
 *.chi
 *.chs.h
 .virtualenv
@@ -9,3 +9,6 @@ cabal-dev
 .cabal-sandbox/
 cabal.sandbox.config
 cabal.config
+*.swp
+*~
+*#*

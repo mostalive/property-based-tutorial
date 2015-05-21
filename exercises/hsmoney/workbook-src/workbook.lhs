@@ -15,4 +15,5 @@ main = do
  P.runTests
  --D.runTests
  S.runTests
+ M.runTests
 \end{code}
