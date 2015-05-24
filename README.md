@@ -114,12 +114,11 @@ npm install underscore
 #### Haskell - FPComplete IDE
 
 Open this link
+
 https://www.fpcomplete.com?ide?git=https://github.com/qwaneu/property-based-tutorial.git
 
-Fork this repository to your own account if you want to save your work,
-and then clone it from within FPComplete IDE. You can also just clone
-https://github.com/qwaneu/property-based-tutorial from within the IDE
-and dispose of your work later.
+to open this git repository in an fp-complete IDE workspace. 
+
 
 ### If all else fails
 
