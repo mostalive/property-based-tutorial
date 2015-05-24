@@ -2,9 +2,9 @@
 % (c) QWAN - Quality Without a Name - www.qwan.eu
 % May 2015
 
-- Rob Westgeest - rob@qwan.eu
-- Marc Evers - marc@qwan.eu
 - Willem van den Ende - willem@qwan.eu
+- Marc Evers - marc@qwan.eu
+- Rob Westgeest - rob@qwan.eu
 
 
 # Prerequisites

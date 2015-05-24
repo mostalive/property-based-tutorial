@@ -1,3 +1,6 @@
+\documentclass{article}
+%include polycode.fmt
+\begin{document}
 Workbook is the main module, that we use to ensure all the code in the examples compiles.
 
 \begin{code}

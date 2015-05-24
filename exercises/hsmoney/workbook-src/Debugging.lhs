@@ -42,3 +42,5 @@ runTests = do
 
 
 TODO explain use of sample to see what data gets generated.
+
+\end{document}

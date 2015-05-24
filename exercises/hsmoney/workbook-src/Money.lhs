@@ -1,25 +1,19 @@
-Property Based Testing Hands On - Haskell money exercise
-(c) QWAN - Quality Without a Name - www.qwan.eu
-May 2015
-
-- Rob Westgeest - rob@qwan.eu
-- Marc Evers - marc@qwan.eu
-- Willem van den Ende - willem@qwan.eu
-
-Modelling Money
+\section{Modelling Money}
 
 In this exercise, we are going to build a class representing Money, step by step. 
 Representing money in software might sound easy, but it is actually non trivial and is often done wrong. 
 Doing it wrong can result in small or big rounding errors or just losing
 a few millions on a bad day...
 
-Getting started
+\subsection{Getting started}
 
 Open the Money.hs file, and add the quickcheck boilerplate, and import fmap and sequential application from Control.Appliccative:
 
 \begin{code}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-} -- for Arbitrary Amount and Currency, and to add Amounts
-{-# LANGUAGE TemplateHaskell #-} -- to generate a test suite as explained in TODO REF
+-- for Arbitrary Amount and Currency, and to add Amounts
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+-- to generate a test suite as explained in TODO REF
+{-# LANGUAGE TemplateHaskell #-}
 module Money where
 import Test.QuickCheck
 import Test.QuickCheck.Property ((===))
@@ -34,8 +28,10 @@ We learnt in the introduction that QuickCheck could easily force us to change ou
 
 
 \begin{code}
-newtype Amount = Amount {amountValue :: Int} deriving (Arbitrary, Num, Eq, Show)
-newtype Currency = Currency { currencyValue :: String} deriving (Eq,Show) 
+newtype Amount = Amount {amountValue :: Int} 
+                   deriving (Arbitrary, Num, Eq, Show)
+newtype Currency = Currency { currencyValue :: String} 
+                     deriving (Eq,Show) 
 \end{code}
 
 For Amount we use GeneralizedNewTypeDeriving, so we can derive an Arbitrary instance to generate arbitrary amounts. The Eq and Show instance are needed so our properties can compare amounts, and quickcheck can show us the failures.
@@ -48,8 +44,9 @@ data Money = Money { currency :: Currency
                    } deriving (Eq, Show)
 
 \end{code}
-
 Choosing explicit data types also will help us generate very specific arbitrary data with QuickCheck.
+
+\subsection{Currency Properties}
 
 Start with something simple: when we add two amounts of the same
 currency, we get a new amount. Our property needs two money objects, so
@@ -97,6 +94,7 @@ We could have defined our Currency also as an Arbitrary, so we could have writte
 
 Now we can generate Money objects!
 
+\subsection{Implement behaviour for Money}
 Now add the behaviour that Money can only be added to money of the same
 currency. Throw an exception when the currencies are different. Make
 sure your property handles this correctly.
@@ -117,11 +115,11 @@ addMoney (Money c1 a1) (Money c2 a2) = case sameCurrency of
 Add a new property that checks that adding is not possible whenever the
 currencies are different.
 
-== Money allocation
+\subsection{Exercise: Money allocation}
 
 We want to be able to allocate money: divide it in equal
 parts, without money getting lost in rounding. 
-An example: dividing €100 in 3 should yield [€33, €33, €34] (assuming whole numbers for now).
+An example: dividing EUR 100 in 3 should yield [EUR 33, EUR 33, EUR 34] (assuming whole numbers for now).
 
 Define a property that states that no money gets lost when dividing an
 amount.
@@ -129,30 +127,30 @@ amount.
 Note that we should make the integer assumption of the amounts more
 explicit, otherwise Javascript will just use doubles.
 
-\begin{code} 
-{- function Money(amount, currency) {
-  this.amount = Math.floor(amount);
-  ...
--}
-\end{code}
+TODO: revive code from git and convert from js to haskell
 
-== Converting from string
+\subsection{Exercise: Converting from string}
 
 We want to be able to create money objects from strings; we support EUR
 and USD. Some legal values:
-- 100 (default is EUR)
-- EUR 10
-- USD 300
-- USD 40- (negative value)
-- EUR 10.000 (. as thousand separator for euros)
 
+\begin{itemize} 
+\item 100 (default is EUR)
+\item EUR 10
+\item USD 300
+\item USD 40- (negative value)
+\item EUR 10.000 (. as thousand separator for euros)
+\end{itemize}
 And some illegal values:
 
-- USD 4.999 (USD has , as thousand separator and . as cents separator)
-- 1,000 (illegal because EUR is default and EUR uses . as thousand
+\begin{itemize} 
+\item USD 4.999 (USD has , as thousand separator and . as cents separator)
+\item 1,000 (illegal because EUR is default and EUR uses . as thousand
   separator)
-- HFL 50 (illegal currency)
-- EUR 10bla
+\item HFL 50 (illegal currency)
+\item EUR 10bla
+
+\end{itemize} 
 
 In our domain model, we work with valid objects. This part focuses on
 processing and validation outside, 'untrusted' data that is transformed
@@ -187,7 +185,7 @@ We can start with either correctness or robustness first. It would be
 interesting to try both approaches and see whether and how it drives you
 to different design decisions.
 
-=== Correctness
+\subsubsection{Correctness}
 
 Given correct input, the conversion should produce valid Money objects. 
 How would you define this as property? 
@@ -198,12 +196,12 @@ from primitive values.
 Hints and tips:
 - If you let your arbitrary generate a tuple (array) of an input string together
   with the corresponding amount and currency values, it will be easier.
-  for your property function to check correctness: __['EUR 100', 'EUR', 100]__
+  for your property function to check correctness: \textbf{['EUR 100', 'EUR', 100]}
 - Take baby steps; start e.g. with regular input with a currency; add support for the default currency; add
   support for thousand separators.
 - Make sure your test fails for the right reason at every step. 
 
-=== Robustness
+\subsubsection{Robustness}
 
 Given any input, the conversion should always produce either a valid
 Money object or a validation error: { money: ... } or { error: 'some message' }
@@ -224,7 +222,7 @@ Hints and tips:
 - jsverify provides the 'oneof' function that combines two arbitraries
   into one that generates values taking values from both arbitraries.
 
-=== Reflection
+\subsection{Reflection}
 
 How did defining the properties and the arbitraries influence you in
 thinking about the problem?
