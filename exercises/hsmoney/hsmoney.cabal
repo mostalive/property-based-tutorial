@@ -45,36 +45,11 @@ build-type:          Simple
 -- Constraint on the version of Cabal needed to build this package.
 cabal-version:         >= 1.20
 
-library
-  -- Other library packages from which modules are imported.
-  build-depends:       base >=4.7 && <4.8
-                       ,QuickCheck >= 2.8.1
-                       ,scientific
-  -- Directories containing source files.
-  -- hs-source-dirs:      
-  
-  -- Base language which the package is written in.
-  default-language:    Haskell2010
-
 executable joy
   hs-source-dirs:      src
   main-is:             joy.hs
   build-depends:       base
-                       ,hsprop
-                       ,QuickCheck >= 2.8
+                       ,QuickCheck >= 2.8.1
                        ,template-haskell
   default-language:    Haskell2010
-
-executable workbook
-  hs-source-dirs:      workbook-src
-  main-is:             workbook.lhs 
-  build-depends:       base
-                       ,hsprop
-                       ,QuickCheck >= 2.8
-                       ,template-haskell
-  default-language:    Haskell2010
-  other-modules:       Step1
-                       ,PropertySuite
-                       ,Debugging
-                       ,Money
 
