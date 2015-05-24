@@ -119,7 +119,6 @@ https://www.fpcomplete.com?ide?git=https://github.com/qwaneu/property-based-tuto
 
 to open this git repository in an fp-complete IDE workspace. 
 
-
 ### If all else fails
 
 Pair up with someone. We recommend this anyway for a better learning
