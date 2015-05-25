@@ -174,7 +174,7 @@ var itemsAreSortedByValue = p.forall(p.nearray(p.asciistring),
   // use the reduce function on array to compare consequtive pairs
     return sorted.reduce(function (isSortedUntilHere, currentItem, index, array) {
       return isSortedUntilHere && (index == 0 || array[index] > array[index-1]);
-    });
+    }, true);
   });
 ```
 
