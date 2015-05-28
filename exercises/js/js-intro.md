@@ -107,14 +107,14 @@ JSVerify provides arbitraries for all the basic types:
 ## Another property
 
 Now, define another simple property, for getting the feel of it. Define
-as an invariant that the square root of a number is always less than (or equal to?) that number.
+as an invariant that the square of a number is always greater than (or equal to?) that number.
 
 You can add an extra property definition and an extra check-call to the same file.
 
 ```javascript
-var squareRootNIsLessThanN = ...
+var squareNIsGreaterThanN = ...
 
-p.check(squareRootNIsLessThanN, options);
+p.check(squareNIsGreaterThanN, options);
 ```
 
 Try it out. Play with the conditions to make it fail on purpose and look
@@ -142,15 +142,19 @@ We want to create a smart sorting/grouping feature for restaurant menus.
 Our input is a randomly ordered list of food items, each having a course. for example:
 
 ```javascript
- [ {course: "starters", dish: "pomodoro soup"}, {course: "main dish", dish: "salmon"},  
-{course: "starters", dish: "veggy soup"}, {dish: "nuts"}, 
-{course: "main dish", dish: "cannelloni"} ]
+ [
+   {course: "starters", dish: "pomodoro soup"},
+   {course: "main dish", dish: "salmon"},
+   {course: "starters", dish: "veggy soup"},
+   {dish: "nuts"},
+   {course: "main dish", dish: "cannelloni"}
+ ]
 ```
 
 We want to sort and order this mess so that:
 - items are grouped by course
 - items without course are put at the end and get the course "other"
-- groups of items should be put in this specific order: "main dish", "side dish", "drinks", "other"
+- groups of items should be put in this specific order: "starters", "main dish", "side dish", "other"
 - items are sorted alphabetically within the groups
 
 ## First property: a sorted result
@@ -182,7 +186,7 @@ Add a check call to verify this property. What happens? Implement the
 sorting function:
 
 ```javascript 
-function complicatedSort(values) {
+function menuSort(values) {
   return values.sort(function (a,b) {
     return a.localeCompare(b);
   });
@@ -204,7 +208,7 @@ We already saw how to compose an arbitrary from an array arbitrary and a
 string arbitrary. There are more combinators available.
 
 ```javascript
-var menuItems = p.record({course: p.asciistring, dish: p.asciistring})
+var menuItem = p.record({course: p.asciistring, dish: p.asciistring})
 ```
 
 The record combinator generator generates JSON objects according to the 'specs'. In
@@ -228,13 +232,13 @@ var _ = require("underscore");
 
 // 2. Extract an 'isSorted' function that checks if an array of menuItems is sorted:
 function isSorted(menuItems) { 
-  return menuItems.reduce(function(prev, curr, index, array) {
-          return prev && (index === 0 || array[index].dish >= array[index-1].dish); 
+  return menuItems.reduce(function(isSortedUntilHere, curr, index, array) {
+          return isSortedUntilHere && (index === 0 || array[index].dish >= array[index-1].dish); 
         }, true);
 }
 
 var valuesAreSortedPercourse = p.forall(p.nearray(menuitems), function(values) {
-      var sorted = complicatedSort(values);
+      var sorted = menuSort(values);
 
 // 3. Use 'groupBy' from Underscore to get a json object with an array per value of property "course":
       var sortedPerCourse = _.groupBy(sorted, "course");
@@ -245,7 +249,10 @@ var valuesAreSortedPercourse = p.forall(p.nearray(menuitems), function(values) {
 });
 ```
 
-Run the tests; does it work?
+Run the tests; does it work?  
+Do you think the sortedPerCourse should be part of the domain code
+(menuSort)?. And if so, do you think the name 'menuSort' is still
+appropriate?
 
 ## Conditional properties
 
@@ -262,7 +269,7 @@ var droppedInputs = 0;
 
 // ...
 // Add a validity check to the property:
-  if (values.some(function (menuItem) { return menuItem.dish === ""; })) {
+  if (menuItems.some(function (menuItem) { return menuItem.dish === ""; })) {
     droppedInputs = droppedInputs + 1;
     return true;
   }
@@ -282,20 +289,13 @@ An alternative approach is to put restriction on your arbitraries. JSVerify
 offers the 'suchthat' function to restrict generated values: 
 
 ```javascript
-var edibles = p.suchthat(p.asciistring, function (s) { return s.length > 0; });
-var courses = p.elements(["main", "drinks", ""]);
-var menuitems = p.record({course: courses, dish: edibles})
+var edible = p.suchthat(p.asciistring, function (s) { return s.length > 0; });
+var course = p.elements(["main", "drinks", ""]);
+var menuitem = p.record({course: course, dish: edible})
 ```
 
 Run the tests and observe what happens. How many inputs are dropped
 now? Remove the input check from the property.
-
-We also want the courses for menu items to be be chosen from a limited set:
-
-```javascript
-var courses = p.elements(["main", "drinks", ""]);
-var menuitems = p.record({course: courses, dish: asciistring})
-```
 
 The 'elements' arbitrary generates values from a given array.
 
