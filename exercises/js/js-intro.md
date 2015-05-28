@@ -139,17 +139,17 @@ Let's put our teeth in a slightly more interesting example, to learn
 more about property based testing.
 
 We want to create a smart sorting/grouping feature for restaurant menus.
-Our input is a randomly ordered list of food items, each having a label. for example:
+Our input is a randomly ordered list of food items, each having a course. for example:
 
 ```javascript
- [ {label: "drinks", value: "ranja"}, {label: "main dish", value: "salmon"},  
-{label: "drinks", value: "beer"}, {value: "nuts"}, 
-{label: "main dish", value: "cannelloni"} ]
+ [ {course: "starters", dish: "pomodoro soup"}, {course: "main dish", dish: "salmon"},  
+{course: "starters", dish: "veggy soup"}, {dish: "nuts"}, 
+{course: "main dish", dish: "cannelloni"} ]
 ```
 
 We want to sort and order this mess so that:
-- items are grouped by label
-- items without label are put at the end and get the label "other"
+- items are grouped by course
+- items without course are put at the end and get the course "other"
 - groups of items should be put in this specific order: "main dish", "side dish", "drinks", "other"
 - items are sorted alphabetically within the groups
 
@@ -167,7 +167,7 @@ function menuSort(items) {
 
 // start with the sorting of items, first just a list of strings:
 
-var itemsAreSortedByValue = p.forall(p.nearray(p.asciistring), 
+var itemsAreSortedByDish = p.forall(p.nearray(p.asciistring), 
   function (items) {
     var sorted = menuSort(items);
 
@@ -204,21 +204,21 @@ We already saw how to compose an arbitrary from an array arbitrary and a
 string arbitrary. There are more combinators available.
 
 ```javascript
-var menuItems = p.record({label: p.asciistring, value: p.asciistring})
+var menuItems = p.record({course: p.asciistring, dish: p.asciistring})
 ```
 
 The record combinator generator generates JSON objects according to the 'specs'. In
-this case, we generate objects with a label property of type string and a value property of type string.
+this case, we generate objects with a course property of type string and a dish property of type string.
 
-Don't forget to update the sorting function: a.value.localeCompare(b.value) 
+Don't forget to update the sorting function: a.dish.localeCompare(b.dish) 
 
-and the property checks: array[index].value
+and the property checks: array[index].dish
 
 ## Refining the property and the arbitrary
 
 The current definition of the property checks if all menu items are
-sorted, but we want to have them sorted per label. Let's group the
-sorted menu items by label and check per group of menu items whether
+sorted, but we want to have them sorted per course. Let's group the
+sorted menu items by course and check per group of menu items whether
 they're sorted.
 
 ```javascript
@@ -229,19 +229,19 @@ var _ = require("underscore");
 // 2. Extract an 'isSorted' function that checks if an array of menuItems is sorted:
 function isSorted(menuItems) { 
   return menuItems.reduce(function(prev, curr, index, array) {
-          return prev && (index === 0 || array[index].value >= array[index-1].value); 
+          return prev && (index === 0 || array[index].dish >= array[index-1].dish); 
         }, true);
 }
 
-var valuesAreSortedPerLabel = p.forall(p.nearray(menuitems), function(values) {
+var valuesAreSortedPercourse = p.forall(p.nearray(menuitems), function(values) {
       var sorted = complicatedSort(values);
 
-// 3. Use 'groupBy' from Underscore to get a json object with an array per value of property "label":
-      var sortedPerLabel = _.groupBy(sorted, "label");
+// 3. Use 'groupBy' from Underscore to get a json object with an array per value of property "course":
+      var sortedPerCourse = _.groupBy(sorted, "course");
 
 // 4. Use the Underscore 'values' function to get an array of all the
 // arrays, and for each one we can check it is sorted:
-      return _.values(sortedPerLabel).every(isSorted);
+      return _.values(sortedPerCourse).every(isSorted);
 });
 ```
 
@@ -262,7 +262,7 @@ var droppedInputs = 0;
 
 // ...
 // Add a validity check to the property:
-  if (values.some(function (menuItem) { return menuItem.value === ""; })) {
+  if (values.some(function (menuItem) { return menuItem.dish === ""; })) {
     droppedInputs = droppedInputs + 1;
     return true;
   }
@@ -283,18 +283,18 @@ offers the 'suchthat' function to restrict generated values:
 
 ```javascript
 var edibles = p.suchthat(p.asciistring, function (s) { return s.length > 0; });
-var labels = p.elements(["main", "drinks", ""]);
-var menuitems = p.record({label: labels, value: edibles})
+var courses = p.elements(["main", "drinks", ""]);
+var menuitems = p.record({course: courses, dish: edibles})
 ```
 
 Run the tests and observe what happens. How many inputs are dropped
 now? Remove the input check from the property.
 
-We also want the labels for menu items to be be chosen from a limited set:
+We also want the courses for menu items to be be chosen from a limited set:
 
 ```javascript
-var labels = p.elements(["main", "drinks", ""]);
-var menuitems = p.record({label: labels, value: asciistring})
+var courses = p.elements(["main", "drinks", ""]);
+var menuitems = p.record({course: courses, dish: asciistring})
 ```
 
 The 'elements' arbitrary generates values from a given array.
@@ -306,11 +306,11 @@ and check more properties of the system under test. Let's define
 another one for our sorter/grouper.
 
 Add a property that checks that for every menu item in the
-sorted result, the label is not empty. Write the property. Make it work
+sorted result, the course is not empty. Write the property. Make it work
 by refining the sorting function.
 
 Another property is whether the menu items are grouped by
-their labels. How can you check this? Write the property.
+their courses. How can you check this? Write the property.
 
 
 # Integrating it in a unit testing framework
@@ -324,8 +324,8 @@ Javascript testing library Mocha:
 
 ```javascript
 describe('A proper menu', function () {
-  it('has its items sorted by value', function () {
-    p.assert(itemsAreSortedByValue);
+  it('has its items sorted by dish', function () {
+    p.assert(itemsAreSortedByDish);
   });
 });
 ```
