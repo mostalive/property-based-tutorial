@@ -193,5 +193,5 @@ like:
 - Java: https://github.com/pholser/junit-quickcheck
 - Javascript: many libraries available, like _jsverify_ and _claire_
 - C# / .Net: FsCheck
-
+- Elm: http://package.elm-lang.org/packages/TheSeamau5/elm-check/3.0.1
 
