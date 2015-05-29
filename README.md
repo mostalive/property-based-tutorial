@@ -115,7 +115,7 @@ npm install underscore
 
 Create an account on `fpcomplete.com`, log in and open this link:
 
-https://www.fpcomplete.com?ide?git=https://github.com/qwaneu/property-based-tutorial.git
+https://www.fpcomplete.com/ide?git=https://github.com/qwaneu/property-based-tutorial.git
 
 to open this git repository in an fp-complete IDE workspace. 
 
