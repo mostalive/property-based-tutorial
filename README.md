@@ -92,6 +92,9 @@ If you are on Windows and have Docker, but no proper SSH client, you might opt f
 installing [x2go-client](http://wiki.x2go.org/doku.php/download:start) .
 This is cool, but a bit more work.
 
+Empty projects and the instructions in pdf format can be found in
+`/home/dockerx/joy/exercises` .
+
 ### Running it in the cloud
 
 #### Javascript 
