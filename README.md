@@ -96,7 +96,7 @@ This is cool, but a bit more work.
 
 #### Javascript 
 
-Cloud9 provides a development environment in the cloud: `https://c9.io/`
+Cloud9 provides a development environment in the cloud: https://c9.io/
 
 You can sign up; it provides a development environment including
 editors, a terminal, NodeJS and Git support. 
@@ -113,7 +113,7 @@ npm install underscore
 
 #### Haskell - FPComplete IDE
 
-Open this link
+Create an account on `fpcomplete.com`, log in and open this link:
 
 https://www.fpcomplete.com?ide?git=https://github.com/qwaneu/property-based-tutorial.git
 
