@@ -11,14 +11,16 @@ RUN add-apt-repository -y ppa:webupd8team/sublime-text-2 && \
 
 WORKDIR /home/dockerx
 
-ADD exercises exercises
+ADD clone-or-pull.sh clone-or-pull.sh
 
-RUN cd exercises/js && \
+RUN ./clone-or-pull.sh https://github.com/qwaneu/property-based-tutorial joy
+
+RUN cd joy/exercises/js && \
     npm install jsverify && \
     npm install underscore
 
-RUN cd exercises/hsmoney && \
+RUN cd joy/exercises/hsmoney && \
     cabal install --only-dependencies
 
-RUN chown -R dockerx.dockerx exercises
+RUN chown -R dockerx.dockerx joy
 
