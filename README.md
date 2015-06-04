@@ -9,9 +9,17 @@ The tutorial comes in two flavours:
 
 ## Current status
 
-This is a work in progress, check back shortly before the conference for
-the final version. Your feedback on things that work and don't is
-appreciated.
+### June 4 2015
+
+It has run, seemed a success, and still is a work in progress, so any
+feedback, and pull requests (we've had our first, thanks Laurent
+Bossavit) welcome.
+
+We've added the promised [Literature references and further
+reading](https://github.com/mostalive/property-based-tutorial/blob/master/exercises/hsmoney/references.md)
+for Haskell, including the original papers (also well worth a read if
+you don't use haskell as all property based testing tools follow
+QuickCheck), more tutorials and various practical uses.
 
 ## Installation options
 
