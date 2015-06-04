@@ -5,9 +5,7 @@
 - [QuickCheck: A Lightweight Tool for Random Testing of
 Haskell Programs, Koen Claessen and John
 Hughes.](http://www.eecs.northwestern.edu/~robby/courses/395-495-2009-fall/quick.pdf) In Proc. of
-International Conference on Functional Programming (ICFP), ACM SIGPLAN,
-2000. Very readable, many examples and references, and still useful
-      after 15 years.
+International Conference on Functional Programming (ICFP), ACM SIGPLAN, 2000. Very readable, many examples and references, and still useful after 15 years.
 
 - [Testing IO actions with
 QuickCheck](www.cse.chalmers.se/~rjmh/Papers/QuickCheckST.ps) by Koen
