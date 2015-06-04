@@ -2,7 +2,20 @@
 
 ## Original papers
 
-- 
+- [QuickCheck: A Lightweight Tool for Random Testing of
+Haskell Programs, Koen Claessen and John
+Hughes.](http://www.eecs.northwestern.edu/~robby/courses/395-495-2009-fall/quick.pdf) In Proc. of
+International Conference on Functional Programming (ICFP), ACM SIGPLAN,
+2000. Very readable, many examples and references, and still useful
+      after 15 years.
+
+- [Testing IO actions with
+QuickCheck](www.cse.chalmers.se/~rjmh/Papers/QuickCheckST.ps) by Koen
+Claessen and John Hughes
+
+- [Introduction to
+QuickCheck](https://wiki.haskell.org/Introduction_to_QuickCheck#Testing_with_QuickCheck)
+on the HaskellWiki has a useful list of references as well.
 
 ## Integratiion with other test frameworks
 
@@ -64,13 +77,28 @@ Free Monad, and then use an interpreter in pure code together with
 QuickCheck to validate some assumptions.
 
 ### Testing stateful code as is
+
 - Testing a web application with hspec
 (http://looprecur.com/blog/testing-a-web-application-with-hspec/) by
 Adam Baker has a small example of using QuickCheck with monadic IO.
 - [Testing IO Actions with monadic
 quickcheck](http://stackoverflow.com/questions/2259926/testing-io-actions-with-monadic-quickcheck)
 on StackOverflow has a few more.
+- [QuickCheck and
+WebDriver](https://www.fpcomplete.com/user/christianpbrink/quickcheck-and-webdriver)
+by Christian Brink. Check that a property holds over a number of web
+pages. In this case a form of decoration.
 
+
+## Testing legacy code
+
+- [QuickCheck as a test set
+generator](https://wiki.haskell.org/QuickCheck_as_a_test_set_generator)
+on the Haskell Wiki. You can use just the Arbitraries and generators to
+generate data for just about anything. Lecacy code, or, we use it to
+test migrations - generate a data structure for one version, save it,
+migrate, and
+check the results with a regular unit test.
  
 # Essays including QuickCheck as part of a wider discussion
 
