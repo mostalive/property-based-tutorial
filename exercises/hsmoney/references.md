@@ -17,6 +17,20 @@ Claessen and John Hughes
 QuickCheck](https://wiki.haskell.org/Introduction_to_QuickCheck#Testing_with_QuickCheck)
 on the HaskellWiki has a useful list of references as well.
 
+## Original tutorial and API Docs
+
+- [QuickCheck: an Automated Testing Tool for
+haskell](http://www.cse.chalmers.se/~rjmh/QuickCheck/manual.html) This
+is the reason we are using NewType extensively in our tutorial.
+
+- [The QuickCheck
+package](https://hackage.haskell.org/package/QuickCheck) is on Hackage.
+The documentation for
+[Test.QuickCheck](https://hackage.haskell.org/package/QuickCheck-2.8.1/docs/Test-QuickCheck.html)
+contains some examples, and since Test.QuickCheck re-exports many of the
+underlying modules, this is a good place to start exploring the API in
+depth.
+
 ## Integratiion with other test frameworks
 
 ## Hspec
