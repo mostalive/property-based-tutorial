@@ -29,11 +29,11 @@ contains some examples, and since Test.QuickCheck re-exports many of the
 underlying modules, this is a good place to start exploring the API in
 depth.
 
-## Integratiion with other test frameworks
+## Integration with other test frameworks
 
 ## Hspec
 
-The [Hspec](http://hspec.github.io/quickcheck.html) github page has a
+The [Hspec](http://hspec.github.io/quickcheck.html) Github page has a
 working example of a quickcheck property inside an hspec describe block.
 
 ## Tasty
