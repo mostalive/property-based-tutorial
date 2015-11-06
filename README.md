@@ -9,27 +9,15 @@ The tutorial comes in two flavours:
 
 ## Current status
 
-### June 4 2015
-
-It has run, seemed a success, and still is a work in progress, so any
-feedback, and pull requests (we've had our first, thanks Laurent
-Bossavit) welcome.
-
-We've added the promised [Literature references and further
-reading](https://github.com/mostalive/property-based-tutorial/blob/master/exercises/hsmoney/references.md)
-for Haskell, including the original papers (also well worth a read if
-you don't use haskell as all property based testing tools follow
-QuickCheck), more tutorials and various practical uses.
+See [Changelog](Changelog)
 
 ## Installation options
 
 There are several options available for doing this tutorial:
 - work with a NodeJS or Haskell installation on your machine
-- use Docker to pull an image that we have prepared with all the
-  Javascript and Haskell stuff installed
-- work in the cloud
+ - work in the cloud (Javascript only)
 
-### You have a working NodeJS or Haskell installation on your machine
+### Local NodeJS or Haskell
 
 Clone this repository 
 `git clone https://github.com/qwaneu/property-based-tutorial.git`
@@ -49,63 +37,23 @@ npm install underscore
 
 #### Haskell
 
+[Install Stack](https://github.com/commercialhaskell/stack)
+
 ```
 cd exercises/hsmoney
-cabal install --only-dependencies
+stack build
 ```
 
 Run the tests with
 ```
-cabal build joy && cabal exec joy 
+stack build joy && stack exec joy 
 ```
 
 Or use the repl, see the [detailed README](exercises/hsmoney/README.md)
 for instructions.
 
-### You have Docker
 
-Pull the image we have prepared and run it, using the following
-commands:
-
-```
-docker pull mostalive/joyofproperties2015
-docker run -d -p 2022:2022 --name joy
-```
-
-This starts a Docker container on localhost. For each session a new
-password for the dockerx and root users are generated. Check it out:
-
-```
-docker logs joy
-```
-
-Copy-paste the password and login:
-
-```
-ssh -AX -p 2022 dockerx@localhost
-```
-
-`-A` forwards your ssh-agent credentials (if any), so you can fork the
-repository on github and push when done. 
-`-X` is for GUI lovers. It will allow you to run one of the editors with a graphical front-end
-on your desktop. We have Emacs, Gedit, Sublime Text, and Atom installed.
-On a Mac you will find that Sublime Text and Atom redraw their screen on
-every keypress and are therefore slow. 
-
-For command-line veterans, you can use Vim or log into ssh without `-X`
-to get Emacs in terminal mode. There is `tmux` to get multiple
-shell windows.
-
-If you are on Windows and have Docker, but no proper SSH client, you might opt for a full desktop by
-installing [x2go-client](http://wiki.x2go.org/doku.php/download:start) .
-This is cool, but a bit more work.
-
-Empty projects and the instructions in pdf format can be found in
-`/home/dockerx/joy/exercises` .
-
-### Running it in the cloud
-
-#### Javascript 
+### Running Javascript in the cloud
 
 Cloud9 provides a development environment in the cloud: https://c9.io/
 
@@ -121,19 +69,6 @@ cd property-based-tutorial/exercises/js
 npm install jsverify
 npm install underscore
 ```
-
-#### Haskell - FPComplete IDE
-
-Create an account on `fpcomplete.com`, log in and open this link:
-
-https://www.fpcomplete.com/ide?git=https://github.com/qwaneu/property-based-tutorial.git
-
-to open this git repository in an fp-complete IDE workspace. 
-
-### If all else fails
-
-Pair up with someone. We recommend this anyway for a better learning
-experience.
 
 # Property Based Testing - Introduction
 
