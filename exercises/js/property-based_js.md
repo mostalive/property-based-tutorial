@@ -66,18 +66,16 @@ Math.sqrt(squared(n)) === n, so we define a _property_ by adding to the
 file:
 
 ```javascript
-var squareRootOfNSquaredEqualsN = j.forall(j.integer(), function (n) {
+var squareRootOfNSquaredEqualsN = j.forall(j.integer, function (n) {
   return Math.sqrt(squared(n)) === n;
 });
 ```
-
-And now comes the magic;
 
 We will use Mocha & Chai to embed the property based tests into a
 testing framework:
 
 ```javascript
-var options = { tests: 100 };
+var options = { tests: 100 }; 
 
 describe('Square root', function () {
   it('square root of n squared always equals n', function () {
@@ -85,6 +83,9 @@ describe('Square root', function () {
   });
 });
 ```
+
+You can use the options to vary the number of samples generated. If you
+leave it out, the default is 100.
 
 Run the tests.
 
@@ -118,12 +119,11 @@ Replace j.integer() by j.nat() and run it again.
 
 JSVerify provides arbitraries for all the basic types:
 
-- j.integer() - integers
-- j.nat() - natural numbers
-- j.number() - doubles
-- j.string() - strings (can be empty, can contain non-ascii characters)
-- j.asciistring - strings with ascii characters (note: this is a property,
-  not a function)
+- j.integer - integers
+- j.nat - natural numbers
+- j.number - doubles
+- j.string - strings (can be empty, can contain non-ascii characters)
+- j.asciistring - strings with ascii character
 
 ## Another property
 
