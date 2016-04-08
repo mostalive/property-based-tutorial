@@ -1,6 +1,10 @@
-% Property Based Testing Hands On - Javascript introduction
-% (c) QWAN - Quality Without a Name - www.qwan.eu
-% April 2016
+# Property Based Testing Hands On - Javascript introduction
+
+![](http://www.qwan.eu/img/qwan_logo_horizontal.png)
+
+(c) QWAN - Quality Without a Name - www.qwan.eu
+
+April 2016
 
 - Rob Westgeest - rob@qwan.eu
 - Marc Evers - marc@qwan.eu
