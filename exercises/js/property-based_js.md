@@ -1,6 +1,10 @@
-% Property Based Testing Hands On - Javascript introduction
-% (c) QWAN - Quality Without a Name - www.qwan.eu
-% May 2015
+# Property Based Testing Hands On - Javascript introduction
+
+![](http://www.qwan.eu/img/qwan_logo_horizontal.png)
+
+(c) QWAN - Quality Without a Name - www.qwan.eu
+
+April 2016
 
 - Rob Westgeest - rob@qwan.eu
 - Marc Evers - marc@qwan.eu
@@ -9,7 +13,7 @@
 
 ## Prerequisites
 
-You need NodeJS (and NPM) and a terminal plus your favorite editor to do
+You need an environment with Javascript and Mocha/Chai (Node) to do
 the Javascript exercise. 
 We use the __jsverify__ library in this tutorial. There are many
 libraries available in your favorite languages, but the basic principles are
@@ -19,11 +23,12 @@ the same.
 https://github.com/jsverify/jsverify
 ```
 
-You need the following node modules for these exercises: 
+You need the following node modules for these exercises (which have
+already been installed if you are using the provided cyber-dojo enviroment): 
 
 ```bash
 npm install jsverify
-npm install underscore
+npm install lodash
 ```
 
 ## Property based testing concepts
@@ -45,11 +50,13 @@ An invariant of the square root and square functions is:
 In an example based test approach, we would write a small number examples showing that this holds.
 We now want to 'proof' that the mentioned invariant holds for all numbers.
 
-Create a new file firststeps.js with:
+Create a new file firstTest.js with:
 
 ```javascript
+"use strict";
+
 // Import the JSVerify library:
-var p = require("jsverify"); 
+var j = require("jsverify"); 
 
 // Define the 'system under test':
 
@@ -63,20 +70,39 @@ Math.sqrt(squared(n)) === n, so we define a _property_ by adding to the
 file:
 
 ```javascript
-var squareRootOfNSquaredEqualsN = p.forall(p.integer(), function (n) {
+var squareRootOfNSquaredEqualsN = j.forall(j.integer, function (n) {
   return Math.sqrt(squared(n)) === n;
 });
 ```
 
-And now comes the magic:
+We will use Mocha & Chai to embed the property based tests into a
+testing framework:
+
+```javascript
+var options = { tests: 100 }; 
+
+describe('Square root', function () {
+  it('square root of n squared always equals n', function () {
+    j.assert(squareRootOfNSquaredEqualsN, options);
+  });
+});
+```
+
+You can use the options to vary the number of samples generated. If you
+leave it out, the default is 100.
+
+Run the tests.
+
+Alternatively, you can run the property based tests without a testing
+framework (run it with node firststeps.js):
 
 ```javascript
 var options = { tests: 100, quiet: false };
 
-p.check(squareRootOfNSquaredEqualsN, options);
+j.check(squareRootOfNSquaredEqualsN, options);
 ```
 
-Run the file with: node firststeps.js
+Run the file with: node firstTest.js
 
 What happens?
 
@@ -87,34 +113,38 @@ for which the property does not hold, it fails and returns the counter example.
 Currently it is configured to generate 100 test cases. You can specify a
 different number using the tests property of the options.
 
-How does it know to generate test data? p.integer() does the job here.
+How does it know to generate test data? j.integer() does the job here.
 It is an _arbitrary_ that can generate random integers. More about
 generators later on.
 
 The test fails because the invariant does not hold for negative numbers.
 We should restrict the generated input to natural numbers only (>=0).
-Replace p.integer() by p.nat() and run it again.
+Replace j.integer() by j.nat() and run it again.
 
 JSVerify provides arbitraries for all the basic types:
 
-- p.integer() - integers
-- p.nat() - natural numbers
-- p.number() - doubles
-- p.string() - strings (can be empty, can contain non-ascii characters)
-- p.asciistring - strings with ascii characters (note: this is a property,
-  not a function)
+- j.integer - integers
+- j.nat - natural numbers
+- j.number - doubles
+- j.string - strings (can be empty, can contain non-ascii characters)
+- j.asciistring - strings with ascii character
 
 ## Another property
 
 Now, define another simple property, for getting the feel of it. Define
 as an invariant that the square of a number is always greater than (or equal to?) that number.
 
-You can add an extra property definition and an extra check-call to the same file.
+You can add an extra property definition to the same file as well as an extra it/assert check-call to the describe block.
 
 ```javascript
 var squareNIsGreaterThanN = ...
 
-p.check(squareNIsGreaterThanN, options);
+describe( ...
+...
+  it('...', function () {
+    j.assert(squareNIsGreaterThanN, options);
+  });
+
 ```
 
 Try it out. Play with the conditions to make it fail on purpose and look
@@ -139,7 +169,7 @@ Let's put our teeth in a slightly more interesting example, to learn
 more about property based testing.
 
 We want to create a smart sorting/grouping feature for restaurant menus.
-Our input is a randomly ordered list of food items, each having a course. for example:
+Our input is a randomly ordered list of dishes, each having a course. for example:
 
 ```javascript
  [
@@ -152,18 +182,21 @@ Our input is a randomly ordered list of food items, each having a course. for ex
 ```
 
 We want to sort and order this mess so that:
-- items are grouped by course
-- items without course are put at the end and get the course "other"
-- groups of items should be put in this specific order: "starters", "main dish", "side dish", "other"
-- items are sorted alphabetically within the groups
+- dishes are grouped by course
+- dishes without course are put at the end and get the course "other"
+- groups of dishes should be put in this specific order: "starters", "main dish", "side dish", "other"
+- dishes are sorted alphabetically within the groups
 
 ## First property: a sorted result
 
 Let's build our sorting & grouping function in small steps, property by
-property. Start with a stubbed function:
+property. Start with a stubbed function (in a new file menuSortTest.js):
 
 ```javascript
-var p = require("jsverify");
+"use strict";
+
+var j = require("jsverify");
+var options = { tests: 100 };
 
 function menuSort(items) {
   return [];
@@ -171,13 +204,14 @@ function menuSort(items) {
 
 // start with the sorting of items, first just a list of strings:
 
-var itemsAreSortedByDish = p.forall(p.nearray(p.asciistring), 
-  function (items) {
-    var sorted = menuSort(items);
+var dishesAreSorted = j.forall(j.nearray(j.asciistring), 
+  function (menuItems) {
+    var sorted = menuSort(menuItems);
 
   // use the reduce function on array to compare consequtive pairs
-    return sorted.reduce(function (isSortedUntilHere, currentItem, index, array) {
-      return isSortedUntilHere && (index == 0 || array[index] > array[index-1]);
+    return sorted.reduce(function (isSortedUntilHere, current, index, array) {
+      return isSortedUntilHere && 
+        (index === 0 || array[index].localeCompare(array[index-1]) > 0);
     }, true);
   });
 ```
@@ -186,8 +220,8 @@ Add a check call to verify this property. What happens? Implement the
 sorting function:
 
 ```javascript 
-function menuSort(values) {
-  return values.sort(function (a,b) {
+function menuSort(items) {
+  return items.sort(function (a,b) {
     return a.localeCompare(b);
   });
 }
@@ -195,7 +229,7 @@ function menuSort(values) {
 
 Run the test again. What happens now? Make it work!
 
-We are using the p.nearray combinator for arbitraries. Based on a provided
+We are using the j.nearray combinator for arbitraries. Based on a provided
 arbitrary (asciistring for ASCII strings in this case), it returns a new arbitrary
 that generates arrays of ASCII strings.
 
@@ -208,7 +242,17 @@ We already saw how to compose an arbitrary from an array arbitrary and a
 string arbitrary. There are more combinators available.
 
 ```javascript
-var menuItem = p.record({course: p.asciistring, dish: p.asciistring})
+var generateMenuItem = j.record({course: j.asciistring, dish: j.asciistring})
+```
+
+It is a good idea to extract the course and dish generators as well:
+
+```javascript
+var generateCourse = j.asciistring;
+var generateDish = j.asciistring;
+var generateMenuItem = j.record({course: generateCourse, dish: generateDish});
+
+var generateMenu = j.nearray(generateMenuItem);
 ```
 
 The record combinator generator generates JSON objects according to the 'specs'. In
@@ -226,30 +270,31 @@ sorted menu items by course and check per group of menu items whether
 they're sorted.
 
 ```javascript
-// 1. We're going to use some useful stuff from the underscore.js library,
+// 1. We're going to use some useful stuff from the Lodash library,
 // add it at the start of the file:
-var _ = require("underscore");
+var _ = require("lodash");
 
 // 2. Extract an 'isSorted' function that checks if an array of menuItems is sorted:
 function isSorted(menuItems) { 
-  return menuItems.reduce(function(isSortedUntilHere, curr, index, array) {
-          return isSortedUntilHere && (index === 0 || array[index].dish >= array[index-1].dish); 
+  return menuItems.reduce(function(isSortedUntilHere, current, index, array) {
+          return isSortedUntilHere && (index === 0 || array[index].dish.localeCompare(array[index-1].dish) >= 0); 
         }, true);
 }
 
-var valuesAreSortedPercourse = p.forall(p.nearray(menuitems), function(values) {
+var valuesAreSortedPercourse = j.forall(j.nearray(menuitems), function(values) {
       var sorted = menuSort(values);
 
-// 3. Use 'groupBy' from Underscore to get a json object with an array per value of property "course":
+// 3. Use 'groupBy' from Lodash to get a json object with an array per value of property "course":
       var sortedPerCourse = _.groupBy(sorted, "course");
 
-// 4. Use the Underscore 'values' function to get an array of all the
+// 4. Use the  'values' function to get an array of all the
 // arrays, and for each one we can check it is sorted:
       return _.values(sortedPerCourse).every(isSorted);
 });
 ```
 
-Run the tests; does it work?  
+Run the tests; does it work?
+
 Do you think the sortedPerCourse should be part of the domain code
 (menuSort)?. And if so, do you think the name 'menuSort' is still
 appropriate?
@@ -275,8 +320,8 @@ var droppedInputs = 0;
   }
 
 // ...
-// Log the number of dropped inputs at the end of the file:
-console.log(droppedInputs);
+// Log the number of dropped inputs to the test, after the assert on the property:
+  console.log('Dropped inputs: ' + droppedInputs);
 ```
 
 Run the tests. Observe what happens.
@@ -289,9 +334,9 @@ An alternative approach is to put restriction on your arbitraries. JSVerify
 offers the 'suchthat' function to restrict generated values: 
 
 ```javascript
-var edible = p.suchthat(p.asciistring, function (s) { return s.length > 0; });
-var course = p.elements(["main", "drinks", ""]);
-var menuitem = p.record({course: course, dish: edible})
+var generateDish = j.suchthat(j.asciistring, function (s) { return s.length > 0; });
+var generateCourse = j.elements(["main", "drinks", ""]);
+var generateMenuitem = j.record({course: generateCourse, dish: generateDish});
 ```
 
 Run the tests and observe what happens. How many inputs are dropped
@@ -313,29 +358,6 @@ Another property is whether the menu items are grouped by
 their courses. How can you check this? Write the property.
 
 
-## Integrating it in a unit testing framework
-
-How do you integrate property based tests with your other automated
-tests?
-
-Property based testing libraries normally provide integration with
-popular testing frameworks. Jsverify integrates for example with the
-Javascript testing library Mocha:
-
-```javascript
-describe('A proper menu', function () {
-  it('has its items sorted by dish', function () {
-    p.assert(itemsAreSortedByDish);
-  });
-});
-```
-
-```bash
-npm install mocha
-
-mocha <your javascript file.js>
-```
-
 # Modelling Money
 
 In this exercise, we are going to build a class representing Money, step by step. 
@@ -345,16 +367,15 @@ a few millions on a bad day...
 
 ## Getting started
 
-Create a new .js file, with the jsverify boilerplate:
+Create a new file (moneyTest.js), with the jsverify boilerplate:
 
 ```javascript 
-var p = require("jsverify");
-var _ = require("underscore");
+"use strict";
 
-var options = {
-  tests: 500,
-  quiet: false 
-};
+var j = require("jsverify");
+var _ = require("lodash");
+
+var options = { tests: 500 };
 ```
 
 Create a class to represent money. It is constructed with an
@@ -377,19 +398,20 @@ we pass two arbitraries to forall and define a property function with two
 arguments:
 
 ```javascript 
-var moneyOfSameCurrencyAddsUp = p.forall(amount, amount, function(a1, a2) { ... }
+var moneyOfSameCurrencyAddsUp = j.forall(generateAmount, generateAmount, function(a1, a2) { ... 
+});
 ```
 
-Create the *amount* arbitrary. We can generating the currency e.g. using: 
+Create the *generateAmount* arbitrary. We can generating the currency e.g. using: 
 
-var currencies = p.elements(["EUR", "USD", "GBP"]);
+var generateCurrency = j.elements(["EUR", "USD", "GBP"]);
 
 How do we generate Money instances? We use the *pair* arbitrary
 combinator to generate amount-currency pairs and use jsverify's *smap* function to transform the pair into a Money object (and back again).
 'smap' stands for symmetric map, and requires two functions, to do a mapping and to perform the inverse mapping:
 
 ```javascript 
-var amount = p.pair(p.nat(), currencies).smap(
+var generateAmount = j.pair(j.nat(), generateCurrency).smap(
   function (x) { return  new Money(x[0], x[1]); }, 
   function (money) { return [money.amount, money.currency]; } );
 ```
