@@ -1,7 +1,7 @@
 # property-based-tutorial
 
 Workshop materials and experiments for property based testing tutorial
-at the Joy of Coding 2015.
+at the Joy of Coding 2015 and ACCU 2016 conferences.
 
 The tutorial comes in two flavours:
 - Javascript - because virtually everyone has to use it these days
