@@ -281,7 +281,7 @@ function isSorted(menuItems) {
         }, true);
 }
 
-var valuesAreSortedPercourse = j.forall(j.nearray(menuitems), function(values) {
+var valuesAreSortedPercourse = j.forall(j.nearray(menuItems), function(values) {
       var sorted = menuSort(values);
 
 // 3. Use 'groupBy' from Lodash to get a json object with an array per value of property "course":
